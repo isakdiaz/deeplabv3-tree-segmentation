@@ -9,4 +9,5 @@
 
 # Ignore IDE specific files
 .idea/
-__pycache__/
+/.vscode
+/__pycache__
