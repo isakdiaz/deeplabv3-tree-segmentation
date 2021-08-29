@@ -1,0 +1,12 @@
+# Ignore Logs Folder
+/logs
+
+# Ignore model folder
+/files
+
+#Ignore testing folder
+/trash
+
+# Ignore IDE specific files
+.idea/
+__pycache__/

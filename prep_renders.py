@@ -27,7 +27,6 @@ def load_data(path):
     fg_names = sorted(glob(os.path.join(path, "foregrounds", "*.png")))
     mask_names = sorted(glob(os.path.join(path, "rendered_masks", "*.png")))
 
-    # # print(bg_names)
     # # Load images into array
     bgs = [cv2.imread(name, cv2.IMREAD_COLOR) for name in bg_names]
     fgs = [cv2.imread(name, cv2.IMREAD_UNCHANGED) for name in fg_names]
@@ -75,16 +74,11 @@ def resize_images(imgs, size=(720, 1280)):
     """
     res = []
     for img in imgs:
-        # print("orig shape ", img.shape)
-        # factor = 1 / min([1, float(img.shape[0])/size[0], float(img.shape[1])/size[1]])
-        factor = max(1, size[0]/float(img.shape[0]), size[1]/float(img.shape[1]))
 
-        # print(factor)
+        factor = max(1, size[0]/float(img.shape[0]), size[1]/float(img.shape[1]))
         if factor != 1: img = scale_image(img, factor)
-        # print("before center crop", img.shape)
+
         img = center_crop(img, size)
-        # print("after center crop", img.shape)
-        # cv2.imwrite(f"test/test{count}.png", img)
         res.append(img)
 
     return res
@@ -110,7 +104,7 @@ def merge(bgs, fgs, size=(513, 513)):
         new_img = bg.copy()
         for i in range(new_img.shape[0]):
             for j in range(new_img.shape[1]):
-                if fg[i][j][-1] == 255:
+                if fg[i][j][-1] > 0:
                     new_img[i][j] = fg[i][j][:3]
         
         res.append(new_img)
@@ -119,35 +113,35 @@ def merge(bgs, fgs, size=(513, 513)):
         
 
 
-def save_images(imgs, path, prefix, start_num=0):
+def save_images(imgs, path, prefix, file_type="jpg", start_num=0):
 
     for img in imgs:
-        cv2.imwrite(os.path.join(path, f"{prefix}_{str(start_num).zfill(5)}.png"), img)
-        # print(f"writing image {start_num}")
+        cv2.imwrite(os.path.join(path, f"{prefix}_{str(start_num).zfill(5)}.{file_type}"), img)
         start_num += 1
 
 
 if __name__ == "__main__":
     
-    MASKS_DIR = "trees/masks"
-    IMAGES_DIR = "trees/images"
+    MASKS_DIR = "data/masks"
+    IMAGES_DIR = "data/images"
+    PREFIX = "pinetree"
 
-    create_dir("tests")
+    create_dir("trash") # folder for troubleshooting
     create_dir(MASKS_DIR)
     create_dir(IMAGES_DIR)
 
 
-    print("Loading Images")
-    bgs, fgs, masks = load_data("trees")
+    print("Loading Images...")
+    bgs, fgs, masks = load_data("data")
     
-    print("Saving Masks")
-    save_images(masks, MASKS_DIR, "pinetree")
+    print("Saving Masks...")
+    save_images(masks, MASKS_DIR, PREFIX, file_type="png")
 
-    # print("resizing Images")
-    # bgs = resize_images(bgs)
+    print("Resizing Images...")
+    bgs = resize_images(bgs)
 
-    # print("merging fgs and bgs")
-    # imgs = merge(bgs, fgs)
+    print("Merging foregrounds and backgrounds...")
+    imgs = merge(bgs, fgs)
 
-    # print("saving images")
-    # save_images(imgs, IMAGES_DIR, "pinetree", 0)
+    print("Saving Images...")
+    save_images(imgs, IMAGES_DIR, PREFIX, file_type="jpg")

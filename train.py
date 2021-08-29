@@ -74,14 +74,14 @@ if __name__ == "__main__":
     create_dir("files")
 
     """ Hyperparameters """
-    batch_size = 32
+    batch_size = 4
     lr = 1e-4
     num_epochs = 20
     model_path = os.path.join("files", "model.h5")
     csv_path = os.path.join("files", "data.csv")
 
     """ Dataset """
-    dataset_path = "new_data"
+    dataset_path = "data_augmented"
     train_path = os.path.join(dataset_path, "train")
     valid_path = os.path.join(dataset_path, "test")
 
@@ -109,9 +109,9 @@ if __name__ == "__main__":
     
     tf.config.list_physical_devices()
 
-    # model.fit(
-    #     train_dataset,
-    #     epochs=num_epochs,
-    #     validation_data=valid_dataset,
-    #     callbacks=callbacks
-    # )
+    model.fit(
+        train_dataset,
+        epochs=num_epochs,
+        validation_data=valid_dataset,
+        callbacks=callbacks
+    )

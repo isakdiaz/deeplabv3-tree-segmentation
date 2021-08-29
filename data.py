@@ -14,7 +14,7 @@ def create_dir(path):
 
 def load_data(path, split=0.1):
     """ Loading the images and masks """
-    X = sorted(glob(os.path.join(path, "images", "*.png")))
+    X = sorted(glob(os.path.join(path, "images", "*.jpg")))
     Y = sorted(glob(os.path.join(path, "masks", "*.png")))
 
     """ Spliting the data into training and testing """
@@ -32,8 +32,6 @@ def augment_data(images, masks, save_path, augment=True):
     for x, y in tqdm(zip(images, masks), total=len(images)):
         """ Extract the name """
         name = x.split("\\")[-1].split(".")[0]
-        # print(name)
-        # name = "pinetree"
 
         """ Reading the image and mask """
         x = cv2.imread(x, cv2.IMREAD_COLOR)
@@ -84,7 +82,7 @@ def augment_data(images, masks, save_path, augment=True):
                 i = cv2.resize(i, (W, H))
                 m = cv2.resize(m, (W, H))
 
-            tmp_image_name = f"{name}_{index}.png"
+            tmp_image_name = f"{name}_{index}.jpg"
             tmp_mask_name = f"{name}_{index}.png"
 
             image_path = os.path.join(save_path, "image", tmp_image_name)
@@ -92,7 +90,7 @@ def augment_data(images, masks, save_path, augment=True):
 
             cv2.imwrite(image_path, i)
             cv2.imwrite(mask_path, m)
-            # print("index is " + str(index))
+
             index += 1
 
 
@@ -101,18 +99,18 @@ if __name__ == "__main__":
     np.random.seed(42)
 
     """ Load the dataset """
-    data_path = "trees"
+    data_path = "data"
     (train_x, train_y), (test_x, test_y) = load_data(data_path)
 
     print(f"Train:\t {len(train_x)} - {len(train_y)}")
     print(f"Test:\t {len(test_x)} - {len(test_y)}")
 
     """ Create directories to save the augmented data """
-    create_dir("new_data/train/image/")
-    create_dir("new_data/train/mask/")
-    create_dir("new_data/test/image/")
-    create_dir("new_data/test/mask/")
+    create_dir("data_augmented/train/image/")
+    create_dir("data_augmented/train/mask/")
+    create_dir("data_augmented/test/image/")
+    create_dir("data_augmented/test/mask/")
 
     """ Data augmentation """
-    augment_data(train_x, train_y, "new_data/train/", augment=True)
-    augment_data(test_x, test_y, "new_data/test/", augment=False)
+    augment_data(train_x, train_y, "data_augmented/train/", augment=True)
+    augment_data(test_x, test_y, "data_augmented/test/", augment=False)
