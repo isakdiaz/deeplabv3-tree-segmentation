@@ -27,7 +27,7 @@ def shuffling(x, y):
     return x, y
 
 def load_data(path):
-    x = sorted(glob(os.path.join(path, "image", "*png")))
+    x = sorted(glob(os.path.join(path, "image", "*jpg")))
     y = sorted(glob(os.path.join(path, "mask", "*png")))
     return x, y
 

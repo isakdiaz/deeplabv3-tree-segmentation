@@ -14,8 +14,8 @@ def create_dir(path):
 
 def load_data(path, split=0.1):
     """ Loading the images and masks """
-    X = sorted(glob(os.path.join(path, "images", "*.jpg")))
-    Y = sorted(glob(os.path.join(path, "masks", "*.png")))
+    X = sorted(glob(os.path.join(path, "image", "*.jpg")))
+    Y = sorted(glob(os.path.join(path, "mask", "*.png")))
 
     """ Spliting the data into training and testing """
     split_size = int(len(X) * split)

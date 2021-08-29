@@ -23,9 +23,9 @@ def create_dir(path):
 def load_data(path):
     
     # Get names in path directory
-    bg_names = sorted(glob(os.path.join(path, "backgrounds", "*.jpeg")))
-    fg_names = sorted(glob(os.path.join(path, "foregrounds", "*.png")))
-    mask_names = sorted(glob(os.path.join(path, "rendered_masks", "*.png")))
+    bg_names = sorted(glob(os.path.join(path, "background", "*.jpeg")))
+    fg_names = sorted(glob(os.path.join(path, "foreground", "*.png")))
+    mask_names = sorted(glob(os.path.join(path, "rendered_mask", "*.png")))
 
     # # Load images into array
     bgs = [cv2.imread(name, cv2.IMREAD_COLOR) for name in bg_names]
@@ -122,8 +122,8 @@ def save_images(imgs, path, prefix, file_type="jpg", start_num=0):
 
 if __name__ == "__main__":
     
-    MASKS_DIR = "data/masks"
-    IMAGES_DIR = "data/images"
+    MASKS_DIR = "data/mask"
+    IMAGES_DIR = "data/image"
     PREFIX = "pinetree"
 
     create_dir("trash") # folder for troubleshooting
