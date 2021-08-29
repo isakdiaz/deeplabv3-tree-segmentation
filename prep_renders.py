@@ -1,0 +1,153 @@
+"""
+Renders and backgrounds must be merged  to form images.
+Corresponding masks must also be cropped to correct dimensions.
+
+"""
+
+
+import os
+from albumentations.augmentations.crops.functional import crop
+import numpy as np
+import cv2
+from glob import glob
+from tqdm import tqdm
+from albumentations import HorizontalFlip, GridDistortion, OpticalDistortion, ChannelShuffle, CoarseDropout, CenterCrop, Crop, Rotate
+import random
+
+
+""" Creating a directory """
+def create_dir(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+def load_data(path):
+    
+    # Get names in path directory
+    bg_names = sorted(glob(os.path.join(path, "backgrounds", "*.jpeg")))
+    fg_names = sorted(glob(os.path.join(path, "foregrounds", "*.png")))
+    mask_names = sorted(glob(os.path.join(path, "rendered_masks", "*.png")))
+
+    # # print(bg_names)
+    # # Load images into array
+    bgs = [cv2.imread(name, cv2.IMREAD_COLOR) for name in bg_names]
+    fgs = [cv2.imread(name, cv2.IMREAD_UNCHANGED) for name in fg_names]
+    masks = [cv2.imread(name, cv2.IMREAD_GRAYSCALE) for name in mask_names]
+
+    # Convert masks to 0 or 1
+    mask_res = []
+    for mask in masks:
+        _, mask = cv2.threshold(mask, 1, 255, cv2.THRESH_BINARY)
+        mask_res.append(mask)
+
+    return (bgs, fgs, mask_res)
+
+
+def center_crop(img, dim):
+	"""Returns center cropped image
+	Args:
+	img: image to be center cropped
+	dim: dimensions (width, height) to be cropped
+	"""
+	height, width = img.shape[0], img.shape[1]
+
+	# process crop width and height for max available dimension
+	crop_width = dim[1] if dim[1]<img.shape[1] else img.shape[1]
+	crop_height = dim[0] if dim[0]<img.shape[0] else img.shape[0] 
+	mid_x, mid_y = int(width/2), int(height/2)
+	cw2, ch2 = int(crop_width/2), int(crop_height/2) 
+	crop_img = img[mid_y-ch2:mid_y+ch2, mid_x-cw2:mid_x+cw2]
+	return crop_img
+
+def scale_image(img, factor=1):
+	"""Returns resize image by scale factor.
+	This helps to retain resolution ratio while resizing.
+	Args:
+	img: image to be scaled
+	factor: scale factor to resize
+	"""
+	return cv2.resize(img,(int(img.shape[1]*factor), int(img.shape[0]*factor)))
+
+
+def resize_images(imgs, size=(720, 1280)):
+    """
+    Returns array with all images of same size.
+    Upscales images if necessary before performing center crop.
+    """
+    res = []
+    for img in imgs:
+        # print("orig shape ", img.shape)
+        # factor = 1 / min([1, float(img.shape[0])/size[0], float(img.shape[1])/size[1]])
+        factor = max(1, size[0]/float(img.shape[0]), size[1]/float(img.shape[1]))
+
+        # print(factor)
+        if factor != 1: img = scale_image(img, factor)
+        # print("before center crop", img.shape)
+        img = center_crop(img, size)
+        # print("after center crop", img.shape)
+        # cv2.imwrite(f"test/test{count}.png", img)
+        res.append(img)
+
+    return res
+
+
+
+def merge(bgs, fgs, size=(513, 513)):
+
+    """
+    Merge two pictures of the same size,
+    Backgrounds are chosen at random.
+    """
+    random.seed(42)
+
+    H = size[0]
+    W = size[1]
+    bgs_len = len(bgs)
+
+    res = []
+    for fg_index in tqdm(range(len(fgs))):
+        fg = fgs[fg_index]
+        bg = bgs[random.randint(0, bgs_len - 1)]
+        new_img = bg.copy()
+        for i in range(new_img.shape[0]):
+            for j in range(new_img.shape[1]):
+                if fg[i][j][-1] == 255:
+                    new_img[i][j] = fg[i][j][:3]
+        
+        res.append(new_img)
+        
+    return res
+        
+
+
+def save_images(imgs, path, prefix, start_num=0):
+
+    for img in imgs:
+        cv2.imwrite(os.path.join(path, f"{prefix}_{str(start_num).zfill(5)}.png"), img)
+        # print(f"writing image {start_num}")
+        start_num += 1
+
+
+if __name__ == "__main__":
+    
+    MASKS_DIR = "trees/masks"
+    IMAGES_DIR = "trees/images"
+
+    create_dir("tests")
+    create_dir(MASKS_DIR)
+    create_dir(IMAGES_DIR)
+
+
+    print("Loading Images")
+    bgs, fgs, masks = load_data("trees")
+    
+    print("Saving Masks")
+    save_images(masks, MASKS_DIR, "pinetree")
+
+    # print("resizing Images")
+    # bgs = resize_images(bgs)
+
+    # print("merging fgs and bgs")
+    # imgs = merge(bgs, fgs)
+
+    # print("saving images")
+    # save_images(imgs, IMAGES_DIR, "pinetree", 0)
