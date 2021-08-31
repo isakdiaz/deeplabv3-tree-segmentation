@@ -1,8 +1,10 @@
-# Ignore Logs Folder
+# Ignore Folders
 /logs
-
-# Ignore model folder
 /files
+/data_augmented/train
+/data_augmented/test
+/data/images
+/data/masks
 
 #Ignore testing folder
 /trash
