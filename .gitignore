@@ -3,8 +3,8 @@
 /files
 /data_augmented/train
 /data_augmented/test
-/data/images
-/data/masks
+/data/image
+/data/mask
 
 #Ignore testing folder
 /trash
