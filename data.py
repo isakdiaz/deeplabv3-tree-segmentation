@@ -31,7 +31,7 @@ def augment_data(images, masks, save_path, augment=True):
 
     for x, y in tqdm(zip(images, masks), total=len(images)):
         """ Extract the name """
-        name = x.split("\\")[-1].split(".")[0]
+        name = x.split("/")[-1].split(".")[0]
 
         """ Reading the image and mask """
         x = cv2.imread(x, cv2.IMREAD_COLOR)
@@ -71,23 +71,23 @@ def augment_data(images, masks, save_path, augment=True):
 
         index = 0
         for i, m in zip(X, Y):
-            try:
-                """ Center Cropping """
-                aug = CenterCrop(H, W, p=1.0)
-                augmented = aug(image=i, mask=m)
-                i = augmented["image"]
-                m = augmented["mask"]
+            # try:
+            #     """ Center Cropping """
+            #     aug = CenterCrop(H, W, p=1.0)
+            #     augmented = aug(image=i, mask=m)
+            #     i = augmented["image"]
+            #     m = augmented["mask"]
 
-            except Exception as e:
-                i = cv2.resize(i, (W, H))
-                m = cv2.resize(m, (W, H))
+            # except Exception as e:
+            i = cv2.resize(i, (W, H))
+            m = cv2.resize(m, (W, H))
 
             tmp_image_name = f"{name}_{index}.jpg"
             tmp_mask_name = f"{name}_{index}.png"
 
             image_path = os.path.join(save_path, "image", tmp_image_name)
             mask_path = os.path.join(save_path, "mask", tmp_mask_name)
-
+            # print(f"saving to {image_path}")
             cv2.imwrite(image_path, i)
             cv2.imwrite(mask_path, m)
 

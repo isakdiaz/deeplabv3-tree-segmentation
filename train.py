@@ -1,6 +1,6 @@
 
 import os
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+# os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 
 import numpy as np
 import cv2
@@ -66,6 +66,8 @@ def tf_dataset(X, Y, batch=2):
 
 
 if __name__ == "__main__":
+    print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
+    
     """ Seeding """
     np.random.seed(42)
     tf.random.set_seed(42)
@@ -74,7 +76,7 @@ if __name__ == "__main__":
     create_dir("files")
 
     """ Hyperparameters """
-    batch_size = 4
+    batch_size = 32
     lr = 1e-4
     num_epochs = 20
     model_path = os.path.join("files", "model.h5")
@@ -113,5 +115,6 @@ if __name__ == "__main__":
         train_dataset,
         epochs=num_epochs,
         validation_data=valid_dataset,
-        callbacks=callbacks
+        callbacks=callbacks,
+        verbose=1
     )
