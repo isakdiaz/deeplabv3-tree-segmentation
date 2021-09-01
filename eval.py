@@ -44,12 +44,18 @@ if __name__ == "__main__":
     np.random.seed(42)
     tf.random.set_seed(42)
 
+    # MODEL_FILENAME = "files/treeseg2021-08-29.h5"
+    GDRIVE_DIR = "/content/drive/MyDrive/saved_models/treeseg" # Save Path for models
+    # MODEL_NAME = "treeseg2021-08-29.h5"
+    MODEL_NAME = "treeseg_2021-09-01.h5"
+    MODEL_FILENAME = os.path.join(GDRIVE_DIR, MODEL_NAME)
+
     """ Directory for storing files """
     create_dir("results")
 
     """ Loading model """
     with CustomObjectScope({'iou': iou, 'dice_coef': dice_coef, 'dice_loss': dice_loss}):
-        model = tf.keras.models.load_model("files/model.h5")
+        model = tf.keras.models.load_model(MODEL_FILENAME)
 
     """ Load the dataset """
     dataset_path = "new_data"

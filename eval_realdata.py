@@ -24,7 +24,6 @@ def create_dir(path):
 
 def load_data(path):
     x = sorted(glob(os.path.join(path, "*jpg")))
-
     return x
 
 
@@ -41,25 +40,28 @@ def save_results(image, y_pred, save_image_path):
     cat_images = np.concatenate([image,  line, y_pred, line, masked_image], axis=1)
     cv2.imwrite(save_image_path, cat_images)
 
-def resize_data(images, save_path, size=(512,512)):
+def resize_data(image, size=(512,512)):
     H = size[0]
     W = size[1]
 
-    for x in tqdm(images, total=len(images)):
-        """ Extract the name """
-        name = x.split("/")[-1].split(".")[0]
+    
+    x_min, y_min = 0, 0
+    print(image.shape)
+    if image.shape[0] < image.shape[1]:
+        x_min = (image.shape[1] - image.shape[0]) // 2
+    elif image.shape[0] > image.shape[1]:
+        y_min = (image.shape[0] - image.shape[1]) // 2
 
-        """ Reading the image and mask """
-        x = cv2.imread(x, cv2.IMREAD_COLOR)
-        
-        # Change aspect ratio to 1:1 before resize
-        i = change_aspect_ratio(i) 
-        i = cv2.resize(i, (W, H))
 
-        tmp_image_name = f"{name}.jpg"
-        image_path = os.path.join(save_path, "image", tmp_image_name)
-        cv2.imwrite(image_path, i)
+    min_dim = min(image.shape[0], image.shape[1])
 
+    image = image[y_min:y_min + min_dim, x_min:x_min+min_dim]
+
+    print(image.shape)
+    image = cv2.resize(image, (W, H))
+    print(image.shape)
+    print("_----------------------")
+    return image
 
 def change_aspect_ratio(image):
     """
@@ -67,7 +69,7 @@ def change_aspect_ratio(image):
     returns: image with 1:1 aspect ratioo
     """
     x_min, y_min = 0, 0
-
+    print(image.shape)
     if image.shape[0] < image.shape[1]:
         x_min = (image.shape[1] - image.shape[0]) // 2
     elif image.shape[0] > image.shape[1]:
@@ -82,7 +84,11 @@ def change_aspect_ratio(image):
 
 if __name__ == "__main__":
 
-    MODEL_FILENAME = "files/treeseg2021-08-29.h5"
+    # MODEL_FILENAME = "files/treeseg2021-08-29.h5"
+    GDRIVE_DIR = "/content/drive/MyDrive/saved_models/treeseg" # Save Path for models
+    # MODEL_NAME = "treeseg2021-08-29.h5"
+    MODEL_NAME = "treeseg_2021-09-01.h5"
+    MODEL_FILENAME = os.path.join(GDRIVE_DIR, MODEL_NAME)
     
     """ Seeding """
     np.random.seed(42)
@@ -102,15 +108,15 @@ if __name__ == "__main__":
     print(f"Test: {len(test_x)}")
 
     """ Evaluation and Prediction """
-    SCORE = []
     for x in tqdm(test_x, total=len(test_x)):
         """ Extract the name """
         name = x.split("/")[-1].split(".")[0]
 
         """ Reading the image """
         image = cv2.imread(x, cv2.IMREAD_COLOR)
+        image = resize_data(image)
         x = image/255.0
-        x = np.expand_dims(x, axis=0).astype(np.int32)
+        x = np.expand_dims(x, axis=0)
         """ Prediction """
         y_pred = model.predict(x)[0]
         y_pred = np.squeeze(y_pred, axis=-1)
