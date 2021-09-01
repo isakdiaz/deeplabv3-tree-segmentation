@@ -118,7 +118,7 @@ def merge(bgs, fgs):
 def save_images(imgs, path, prefix, file_type="jpg", start_num=0):
 
     for img in imgs:
-        print(img.shape)
+        # print(img.shape)
         cv2.imwrite(os.path.join(path, f"{prefix}_{str(start_num).zfill(5)}.{file_type}"), img)
         start_num += 1
 

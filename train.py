@@ -76,7 +76,7 @@ if __name__ == "__main__":
     create_dir("files")
 
     """ Hyperparameters """
-    batch_size = 32
+    batch_size = 8
     lr = 1e-4
     num_epochs = 20
     model_path = os.path.join("files", "model.h5")
