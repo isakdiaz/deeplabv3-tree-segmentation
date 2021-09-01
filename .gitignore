@@ -5,6 +5,7 @@
 /data_augmented/test
 /data/image
 /data/mask
+/data/trash
 
 #Ignore testing folder
 /trash

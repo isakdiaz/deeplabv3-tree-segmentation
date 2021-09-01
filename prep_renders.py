@@ -11,8 +11,8 @@ import numpy as np
 import cv2
 from glob import glob
 from tqdm import tqdm
-from albumentations import HorizontalFlip, GridDistortion, OpticalDistortion, ChannelShuffle, CoarseDropout, CenterCrop, Crop, Rotate
 import random
+import skimage
 
 
 """ Creating a directory """
@@ -67,7 +67,7 @@ def scale_image(img, factor=1):
 	return cv2.resize(img,(int(img.shape[1]*factor), int(img.shape[0]*factor)))
 
 
-def resize_images(imgs, size=(720, 1280)):
+def resize_images(imgs, size=(720, 720)):
     """
     Returns array with all images of same size.
     Upscales images if necessary before performing center crop.
@@ -83,18 +83,20 @@ def resize_images(imgs, size=(720, 1280)):
 
     return res
 
+def left_crop(images, width=720):
+    for i in range(len(images)):
+        images[i] = images[i][:,:width]
+        # print(images[i].shape)
+    return images
 
-
-def merge(bgs, fgs, size=(513, 513)):
+def merge(bgs, fgs):
 
     """
     Merge two pictures of the same size,
     Backgrounds are chosen at random.
     """
-    random.seed(42)
+    # random.seed(42)
 
-    H = size[0]
-    W = size[1]
     bgs_len = len(bgs)
 
     res = []
@@ -116,16 +118,77 @@ def merge(bgs, fgs, size=(513, 513)):
 def save_images(imgs, path, prefix, file_type="jpg", start_num=0):
 
     for img in imgs:
+        print(img.shape)
         cv2.imwrite(os.path.join(path, f"{prefix}_{str(start_num).zfill(5)}.{file_type}"), img)
         start_num += 1
 
+def save_test_image(img, prefix="test", path= "trash", file_type="jpg"):
+    random_ind = np.random.randint(0,100)
+    cv2.imwrite(os.path.join(path, f"{prefix}_{random_ind}.{file_type}"), img)
+
+def salt_and_pepper_noise(image, prob):
+    """
+    Add salt and pepper noise to image
+    prob: Probability of the noise
+    """
+    output = np.zeros(image.shape,np.uint8)
+    thres = 1 - prob 
+    for i in range(image.shape[0]):
+        for j in range(image.shape[1]):
+            rdn = random.random()
+            if rdn < prob:
+                output[i][j] = 0
+            elif rdn > thres:
+                output[i][j] = 255
+            else:
+                output[i][j] = image[i][j]
+    return output
+
+def random_noise(image, prob = 0.75):
+    """
+    input: rgb image 0-255, probability of adding noise
+    output: rgb image 0-255
+
+    """
+
+    if(np.random.random() > prob): return image
+    modes = ["gaussian", "poisson", "speckle", "salt", "pepper", "s&p"]
+    ind = np.random.randint(0, len(modes))
+
+    # Salt and pepper noise requires extra parameter that crashes other modes
+    if modes[ind] in ["salt", "pepper", "s&p"]:
+        image = skimage.util.random_noise(image, mode=modes[ind], amount=0.005)
+    else:
+        image = skimage.util.random_noise(image, mode=modes[ind])
+
+    # Skimage converts image from 0-255 to 0-1.0, need to convert back
+    # If you don't return array to int, RAM usage will explode
+    image = (image * 255).astype(np.uint8, casting='unsafe')
+
+    return image
+
+def add_noise(images, prob=0.75):
+
+    for i in range(len(images)):
+        images[i] = random_noise(images[i], prob=prob)
+    
+    return images
+
+# def salt_and_pepper_images(images, prob=0.005):
+#     for image in images:
+#         print(np.max(image))
+#         image = skimage.util.random_noise(image,  mode='speckle')
+#         print(np.max(image))
+#         save_test_image(image*255)
+#         break
 
 if __name__ == "__main__":
     
     MASKS_DIR = "data/mask"
     IMAGES_DIR = "data/image"
-    PREFIX = "pinetree"
+    PREFIX = "oaktree"
 
+    print("Creating Directories...")
     create_dir("trash") # folder for troubleshooting
     create_dir(MASKS_DIR)
     create_dir(IMAGES_DIR)
@@ -133,7 +196,21 @@ if __name__ == "__main__":
 
     print("Loading Images...")
     bgs, fgs, masks = load_data("data")
+
+    print("Cropping Images to Squares...")
+    fgs = left_crop(fgs, 720)
+    masks = left_crop(masks, 720)
+
     
+    print("Adding noise to foregrounds...")
+    fgs = add_noise(fgs)
+
+    print("Adding noise to backgrounds...")
+    bgs = add_noise(bgs)
+
+    # print("Saving fgs...")
+    # save_images(fgs, "trash", "test", file_type="png")
+ 
     print("Saving Masks...")
     save_images(masks, MASKS_DIR, PREFIX, file_type="png")
 
