@@ -6,6 +6,8 @@
 /data/image
 /data/mask
 /data/trash
+/results
+/results_realdata
 
 #Ignore testing folder
 /trash

@@ -25,9 +25,9 @@ def load_data(path, split=0.1):
 
     return (train_x, train_y), (test_x, test_y)
 
-def augment_data(images, masks, save_path, augment=True):
-    H = 512
-    W = 512
+def augment_data(images, masks, save_path, augment=True, size=(512,512)):
+    H = size[0]
+    W = size[1]
 
     for x, y in tqdm(zip(images, masks), total=len(images)):
         """ Extract the name """
@@ -92,6 +92,7 @@ def augment_data(images, masks, save_path, augment=True):
             cv2.imwrite(mask_path, m)
 
             index += 1
+
 
 
 if __name__ == "__main__":
