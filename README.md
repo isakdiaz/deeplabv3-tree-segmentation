@@ -76,3 +76,7 @@ Training on synthetic data has mixed results in the real world, however it can h
 
 # iOS Implementation
 _treeseg_coreml.ipynb_ file will allow you to convert the model into a CoreML model for iPhone/iPad.  If you need a sample project to test out the model, check out my other repo: https://github.com/isakdiaz/mobilenetv2-ios-app
+
+<br/><br/>
+
+## If you want to see more results, check out the [colab notebook.](treeseg_train.ipynb)
