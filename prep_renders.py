@@ -23,7 +23,7 @@ def create_dir(path):
 def load_data(path):
     
     # Get names in path directory
-    bg_names = sorted(glob(os.path.join(path, "background", "*.jpeg")))
+    bg_names = sorted(glob(os.path.join(path, "background", "*.jp*g")))
     fg_names = sorted(glob(os.path.join(path, "foreground", "*.png")))
     mask_names = sorted(glob(os.path.join(path, "rendered_mask", "*.png")))
 
@@ -197,28 +197,28 @@ if __name__ == "__main__":
     print("Loading Images...")
     bgs, fgs, masks = load_data("data")
 
-    print("Cropping Images to Squares...")
-    fgs = left_crop(fgs, 720)
-    masks = left_crop(masks, 720)
+    # print("Cropping Images to Squares...")
+    # fgs = left_crop(fgs, 720)
+    # masks = left_crop(masks, 720)
 
     
-    print("Adding noise to foregrounds...")
-    fgs = add_noise(fgs)
+    # print("Adding noise to foregrounds...")
+    # fgs = add_noise(fgs)
 
-    print("Adding noise to backgrounds...")
-    bgs = add_noise(bgs)
+    # print("Adding noise to backgrounds...")
+    # bgs = add_noise(bgs)
 
-    # print("Saving fgs...")
-    # save_images(fgs, "trash", "test", file_type="png")
+    # # print("Saving fgs...")
+    # # save_images(fgs, "trash", "test", file_type="png")
  
-    print("Saving Masks...")
-    save_images(masks, MASKS_DIR, PREFIX, file_type="png")
+    # print("Saving Masks...")
+    # save_images(masks, MASKS_DIR, PREFIX, file_type="png")
 
-    print("Resizing Images...")
-    bgs = resize_images(bgs)
+    # print("Resizing Images...")
+    # bgs = resize_images(bgs)
 
-    print("Merging foregrounds and backgrounds...")
-    imgs = merge(bgs, fgs)
+    # print("Merging foregrounds and backgrounds...")
+    # imgs = merge(bgs, fgs)
 
-    print("Saving Images...")
-    save_images(imgs, IMAGES_DIR, PREFIX, file_type="jpg")
+    # print("Saving Images...")
+    # save_images(imgs, IMAGES_DIR, PREFIX, file_type="jpg")
