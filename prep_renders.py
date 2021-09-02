@@ -174,14 +174,6 @@ def add_noise(images, prob=0.75):
     
     return images
 
-# def salt_and_pepper_images(images, prob=0.005):
-#     for image in images:
-#         print(np.max(image))
-#         image = skimage.util.random_noise(image,  mode='speckle')
-#         print(np.max(image))
-#         save_test_image(image*255)
-#         break
-
 if __name__ == "__main__":
     
     MASKS_DIR = "data/mask"
@@ -197,28 +189,28 @@ if __name__ == "__main__":
     print("Loading Images...")
     bgs, fgs, masks = load_data("data")
 
-    # print("Cropping Images to Squares...")
-    # fgs = left_crop(fgs, 720)
-    # masks = left_crop(masks, 720)
+    print("Cropping Images to Squares...")
+    fgs = left_crop(fgs, 720)
+    masks = left_crop(masks, 720)
 
     
-    # print("Adding noise to foregrounds...")
-    # fgs = add_noise(fgs)
+    print("Adding noise to foregrounds...")
+    fgs = add_noise(fgs)
 
-    # print("Adding noise to backgrounds...")
-    # bgs = add_noise(bgs)
+    print("Adding noise to backgrounds...")
+    bgs = add_noise(bgs)
 
-    # # print("Saving fgs...")
-    # # save_images(fgs, "trash", "test", file_type="png")
+    # print("Saving fgs...")
+    # save_images(fgs, "trash", "test", file_type="png")
  
-    # print("Saving Masks...")
-    # save_images(masks, MASKS_DIR, PREFIX, file_type="png")
+    print("Saving Masks...")
+    save_images(masks, MASKS_DIR, PREFIX, file_type="png")
 
-    # print("Resizing Images...")
-    # bgs = resize_images(bgs)
+    print("Resizing Images...")
+    bgs = resize_images(bgs)
 
-    # print("Merging foregrounds and backgrounds...")
-    # imgs = merge(bgs, fgs)
+    print("Merging foregrounds and backgrounds...")
+    imgs = merge(bgs, fgs)
 
-    # print("Saving Images...")
-    # save_images(imgs, IMAGES_DIR, PREFIX, file_type="jpg")
+    print("Saving Images...")
+    save_images(imgs, IMAGES_DIR, PREFIX, file_type="jpg")
