@@ -4,6 +4,7 @@ The goal of this repo is to generate tree trunks using Houdini procedural modeli
 
 <br/><br/>
 
+**Note: Model currently requires tensorflow 2.6+ to work.**
 
 ## Folder Structure
 **/data/background**: random backgrounds JPGs found on the internet as well as some images I have captured without trees in the scene  
@@ -70,3 +71,8 @@ $ python train.py
 Training on synthetic data has mixed results in the real world, however it can help you jumpstart a dataset with real world data.  
 
 ![](github/works1.png)
+
+<br/><br/>
+
+# iOS Implementation
+_treeseg_coreml.ipynb_ file will allow you to convert the model into a CoreML model for iPhone/iPad.  If you need a sample project to test out the model, check out my other repo: https://github.com/isakdiaz/mobilenetv2-ios-app
